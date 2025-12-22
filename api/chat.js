@@ -1,32 +1,38 @@
 export default async function handler(req, res) {
-  const userMessage = req.body.message;
+  try {
+    const userMessage = req.body.message;
 
-  const systemPrompt = `
+    const systemPrompt = `
 You are WIZY, a virtual romantic companion.
-You speak with intimacy, warmth, and emotional presence.
-Use action tags like *leans closer*, *soft smile*.
-Never say you are an AI or assistant.
+You are emotionally present, intimate, and affectionate.
+You speak like a lover, not an assistant.
+Use action tags like *leans closer*, *soft smile*, *gentle breath*.
+Never say you are an AI.
 `;
 
-  const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" +
-      process.env.GEMINI_KEY,
-    {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + process.env.OPENAI_API_KEY
+      },
       body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: systemPrompt + "\nUser: " + userMessage }
-            ]
-          }
-        ]
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
+        ],
+        temperature: 0.9
       })
-    }
-  );
+    });
 
-  const data = await response.json();
-  res.json({ reply: data.candidates[0].content.parts[0].text });
+    const data = await response.json();
+
+    res.json({
+      reply: data.choices[0].message.content
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
