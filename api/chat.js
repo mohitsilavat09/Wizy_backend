@@ -1,6 +1,3 @@
-if (req.method !== "POST") {
-  return res.status(200).json({ message: "API is working" });
-}
 export default async function handler(req, res) {
   try {
     const userMessage = req.body.message;
