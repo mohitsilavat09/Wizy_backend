@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   try {
-    const userMessage = req.body.message;
+     const userMessage = req.body.message;
 
     const systemPrompt = `
 You are WIZY, a virtual romantic companion.
